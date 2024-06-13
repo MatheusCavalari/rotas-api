@@ -9,12 +9,12 @@ public class RotaController : Controller
 {
 #warning Update config documentation
 
-    //private readonly IRotaService _rotaService;
+    private readonly IRotaService _rotaService;
 
-    //public RotaController(IRotaService rotaService)
-    //{
-    //    _rotaService = rotaService;
-    //}
+    public RotaController(IRotaService rotaService)
+    {
+        _rotaService = rotaService;
+    }
 
     /// <summary>
     /// Obtém todas as rotas disponíveis
