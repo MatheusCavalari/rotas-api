@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RotasApi.DTOs;
 
 namespace RotasApi.Controllers;
 
