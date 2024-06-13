@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RotasApi.DTOs;
+using RotasApi.Models;
 using RotasApi.Services;
 
 namespace RotasApi.Controllers;
@@ -57,7 +58,7 @@ public class RotaController : Controller
     /// <response code="201">Caso inserção seja feita com sucesso</response>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<ActionResult<RotaDTO>> Post(RotaDTO rotaDto)
+    public async Task<ActionResult<Rota>> Post(RotaDTO rotaDto)
     {
         var novaRota = await _rotaService.Adicionar(rotaDto);
         return CreatedAtAction(nameof(Get), new { id = novaRota.Id }, novaRota);

@@ -28,11 +28,11 @@ namespace RotasApi.Services
             return _mapper.Map<RotaDTO>(rota);
         }
 
-        public async Task<RotaDTO> Adicionar(RotaDTO rotaDto)
+        public async Task<Rota> Adicionar(RotaDTO rotaDto)
         {
             var rota = _mapper.Map<Rota>(rotaDto);
             var novaRota = await _rotaRepository.Adicionar(rota);
-            return _mapper.Map<RotaDTO>(novaRota);
+            return novaRota;
         }
 
         public async Task<RotaDTO> Atualizar(int id, RotaDTO rotaDto)
