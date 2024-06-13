@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RotasApi.DTOs;
+using RotasApi.Services;
 
 namespace RotasApi.Controllers;
 
