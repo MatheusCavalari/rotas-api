@@ -9,52 +9,75 @@ namespace RotasApi.Services
     {
         private readonly IRotaRepository _rotaRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<RotaService> _logger;
 
-        public RotaService(IRotaRepository rotaRepository, IMapper mapper)
+        public RotaService(IRotaRepository rotaRepository, IMapper mapper, ILogger<RotaService> logger)
         {
             _rotaRepository = rotaRepository;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<RotaDTO>> ObterTodas()
         {
+            _logger.LogInformation("Obtendo todas as rotas");
             var rotas = await _rotaRepository.ObterTodas();
+            _logger.LogInformation("Obtenção de todas as rotas concluída com sucesso");
             return _mapper.Map<IEnumerable<RotaDTO>>(rotas);
         }
 
         public async Task<RotaDTO> ObterPorId(int id)
         {
+            _logger.LogInformation($"Obtendo rota com ID: {id}");
             var rota = await _rotaRepository.ObterPorId(id);
+            if (rota == null)
+                _logger.LogWarning($"Rota com ID: {id} não encontrada");
+            else
+                _logger.LogInformation($"Rota com ID: {id} obtida com sucesso");
             return _mapper.Map<RotaDTO>(rota);
         }
 
         public async Task<Rota> Adicionar(RotaDTO rotaDto)
         {
+            _logger.LogInformation($"Iniciando adição de uma nova rota com origem: {rotaDto.Origem} e destino: {rotaDto.Destino}");
             var rota = _mapper.Map<Rota>(rotaDto);
             var novaRota = await _rotaRepository.Adicionar(rota);
+            _logger.LogInformation($"Nova rota adicionada com sucesso com ID: {novaRota.Id}");
+            return novaRota;
             return novaRota;
         }
 
         public async Task<RotaDTO> Atualizar(int id, RotaDTO rotaDto)
         {
+            _logger.LogInformation($"Iniciando atualização da rota com ID: {id}");
             var rotaExistente = await _rotaRepository.ObterPorId(id);
             if (rotaExistente == null)
             {
+                _logger.LogWarning($"Rota com ID: {id} não encontrada para atualização");
                 return null;
             }
 
             var rota = _mapper.Map(rotaDto, rotaExistente);
             var rotaAtualizada = await _rotaRepository.Atualizar(rota);
+            _logger.LogInformation($"Rota com ID: {id} atualizada com sucesso");
             return _mapper.Map<RotaDTO>(rotaAtualizada);
         }
 
         public async Task<bool> Remover(int id)
         {
-            return await _rotaRepository.Remover(id);
+            _logger.LogInformation($"Iniciando remoção da rota com ID: {id}");
+            var sucesso = await _rotaRepository.Remover(id);
+            if (sucesso)
+                _logger.LogInformation($"Rota com ID: {id} removida com sucesso");
+            else
+                _logger.LogWarning($"Rota com ID: {id} não encontrada para remoção");
+            return sucesso;
         }
 
         public async Task<string> ConsultarMelhorRota(string origem, string destino)
         {
+            _logger.LogInformation($"Iniciando consulta da melhor rota de {origem} para {destino}");
+
             var rotas = await _rotaRepository.ObterTodas();
             var graph = new Dictionary<string, List<(string destino, int valor)>>();
 
@@ -68,21 +91,26 @@ namespace RotasApi.Services
             }
 
             var result = BuscarMelhorRota(graph, origem, destino);
+            _logger.LogInformation($"Consulta da melhor rota de {origem} para {destino} concluída com resultado: {result}");
             return result;
         }
 
         private string BuscarMelhorRota(Dictionary<string, List<(string destino, int valor)>> graph, string origem, string destino)
         {
-            var pq = new PriorityQueue<(string cidade, decimal custo, List<string> caminho), decimal>();
-            pq.Enqueue((origem, 0, new List<string> { origem }), 0);
+            _logger.LogInformation($"Iniciando busca da melhor rota de {origem} para {destino}");
+            _logger.LogInformation($"Iniciando busca da melhor rota de {origem} para {destino}");
+            var filaDePrioridade = new PriorityQueue<(string cidade, decimal custo, List<string> caminho), decimal>();
+            filaDePrioridade.Enqueue((origem, 0, new List<string> { origem }), 0);
 
-            while (pq.Count > 0)
+            while (filaDePrioridade.Count > 0)
             {
-                var (cidade, custo, caminho) = pq.Dequeue();
+                var (cidade, custo, caminho) = filaDePrioridade.Dequeue();
 
                 if (cidade == destino)
                 {
-                    return string.Join(" - ", caminho) + $" ao custo de ${custo}";
+                    var resultado = string.Join(" - ", caminho) + $" ao custo de ${custo}";
+                    _logger.LogInformation($"Melhor rota encontrada: {resultado}");
+                    return resultado;
                 }
 
                 if (graph.ContainsKey(cidade))
@@ -90,11 +118,12 @@ namespace RotasApi.Services
                     foreach (var (proxDestino, proxCusto) in graph[cidade])
                     {
                         var novoCaminho = new List<string>(caminho) { proxDestino };
-                        pq.Enqueue((proxDestino, custo + proxCusto, novoCaminho), custo + proxCusto);
+                        filaDePrioridade.Enqueue((proxDestino, custo + proxCusto, novoCaminho), custo + proxCusto);
                     }
                 }
             }
 
+            _logger.LogWarning($"Nenhuma rota encontrada de {origem} para {destino}");
             return "Rota não encontrada";
         }
     }
