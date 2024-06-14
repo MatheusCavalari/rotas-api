@@ -26,8 +26,15 @@ public class RotaController : Controller
     [HttpGet]
     public async Task<ActionResult<IEnumerable<RotaDTO>>> Get()
     {
-        var rotas = await _rotaService.ObterTodas();
-        return Ok(rotas);
+        try
+        {
+            var rotas = await _rotaService.ObterTodas();
+            return Ok(rotas);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Erro ao obter rotas: {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -42,12 +49,20 @@ public class RotaController : Controller
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<RotaDTO>> Get(int id)
     {
-        var rota = await _rotaService.ObterPorId(id);
-        if (rota == null)
+        try
         {
-            return NotFound();
+
+            var rota = await _rotaService.ObterPorId(id);
+            if (rota == null)
+            {
+                return NotFound();
+            }
+            return Ok(rota);
         }
-        return Ok(rota);
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Erro ao obter rota com ID: {id}. {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -60,8 +75,15 @@ public class RotaController : Controller
     [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<ActionResult<Rota>> Post(RotaDTO rotaDto)
     {
-        var novaRota = await _rotaService.Adicionar(rotaDto);
-        return CreatedAtAction(nameof(Get), new { id = novaRota.Id }, novaRota);
+        try
+        {
+            var novaRota = await _rotaService.Adicionar(rotaDto);
+            return CreatedAtAction(nameof(Get), new { id = novaRota.Id }, novaRota);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Erro ao adicionar rota: {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -77,12 +99,19 @@ public class RotaController : Controller
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Put(int id, RotaDTO rotaDto)
     {
-        var rotaAtualizada = await _rotaService.Atualizar(id, rotaDto);
-        if (rotaAtualizada == null)
+        try
         {
-            return NotFound();
+            var rotaAtualizada = await _rotaService.Atualizar(id, rotaDto);
+            if (rotaAtualizada == null)
+            {
+                return NotFound();
+            }
+            return NoContent();
         }
-        return NoContent();
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Erro ao atualizar rota com ID: {id}. {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -97,12 +126,19 @@ public class RotaController : Controller
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(int id)
     {
-        var sucesso = await _rotaService.Remover(id);
-        if (!sucesso)
+        try
         {
-            return NotFound();
+            var sucesso = await _rotaService.Remover(id);
+            if (!sucesso)
+            {
+                return NotFound();
+            }
+            return NoContent();
         }
-        return NoContent();
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Erro ao remover rota com ID: {id}. {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -116,7 +152,14 @@ public class RotaController : Controller
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<string>> ConsultarMelhorRota([FromQuery] string origem, [FromQuery] string destino)
     {
-        var resultado = await _rotaService.ConsultarMelhorRota(origem, destino);
-        return Ok(resultado);
+        try
+        {
+            var resultado = await _rotaService.ConsultarMelhorRota(origem, destino);
+            return Ok(resultado);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Erro ao consultar melhor rota de {origem} para {destino}. {ex.Message}");
+        }
     }
 }
