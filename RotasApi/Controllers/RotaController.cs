@@ -24,7 +24,7 @@ public class RotaController : Controller
     /// <returns>Lista de rotas</returns>
     /// <response code="200">Retorna a lista de rotas</response>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<RotaDTO>>> Get()
+    public async Task<ActionResult<IEnumerable<Rota>>> Get()
     {
         try
         {

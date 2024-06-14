@@ -18,14 +18,14 @@ namespace RotasApi.Services
             _logger = logger;
         }
 
-        public async Task<IEnumerable<RotaDTO>> ObterTodas()
+        public async Task<IEnumerable<Rota>> ObterTodas()
         {
             try
             {
                 _logger.LogInformation("Obtendo todas as rotas");
                 var rotas = await _rotaRepository.ObterTodas();
                 _logger.LogInformation("Obtenção de todas as rotas concluída com sucesso");
-                return _mapper.Map<IEnumerable<RotaDTO>>(rotas);
+                return rotas;
             }
             catch (Exception ex)
             {

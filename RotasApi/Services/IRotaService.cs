@@ -5,7 +5,7 @@ namespace RotasApi.Services;
 
 public interface IRotaService
 {
-    Task<IEnumerable<RotaDTO>> ObterTodas();
+    Task<IEnumerable<Rota>> ObterTodas();
     Task<RotaDTO> ObterPorId(int id);
     Task<Rota> Adicionar(RotaDTO rotaDto);
     Task<RotaDTO> Atualizar(int id, RotaDTO rotaDto);
