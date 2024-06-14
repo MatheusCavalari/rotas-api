@@ -6,7 +6,7 @@ using RotasApi.Services;
 namespace RotasApi.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("v1/[controller]")]
 public class RotaController : Controller
 {
 #warning Update config documentation
@@ -155,7 +155,7 @@ public class RotaController : Controller
         try
         {
             var resultado = await _rotaService.ConsultarMelhorRota(origem, destino);
-            return Ok(resultado);
+            return Ok(new { rota = resultado });
         }
         catch (Exception ex)
         {
