@@ -9,5 +9,6 @@ public class RotaProfile : Profile
     public RotaProfile() 
     {
         CreateMap<Rota, RotaDTO>();
+        CreateMap<RotaDTO, Rota>();
     }
 }

@@ -56,13 +56,13 @@ namespace RotasApi.Services
         public async Task<string> ConsultarMelhorRota(string origem, string destino)
         {
             var rotas = await _rotaRepository.ObterTodas();
-            var graph = new Dictionary<string, List<(string destino, decimal valor)>>();
+            var graph = new Dictionary<string, List<(string destino, int valor)>>();
 
             foreach (var rota in rotas)
             {
                 if (!graph.ContainsKey(rota.Origem))
                 {
-                    graph[rota.Origem] = new List<(string destino, decimal valor)>();
+                    graph[rota.Origem] = new List<(string destino, int valor)>();
                 }
                 graph[rota.Origem].Add((rota.Destino, rota.Valor));
             }
@@ -71,7 +71,7 @@ namespace RotasApi.Services
             return result;
         }
 
-        private string BuscarMelhorRota(Dictionary<string, List<(string destino, decimal valor)>> graph, string origem, string destino)
+        private string BuscarMelhorRota(Dictionary<string, List<(string destino, int valor)>> graph, string origem, string destino)
         {
             var pq = new PriorityQueue<(string cidade, decimal custo, List<string> caminho), decimal>();
             pq.Enqueue((origem, 0, new List<string> { origem }), 0);
